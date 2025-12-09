@@ -131,7 +131,7 @@ export const LevelOnePrompt = ({ onComplete }: { onComplete: () => void }) => {
 };
 
 // --- Level 2: Extension of Intelligence ---
-export const LevelTwoExtension = ({ onComplete }: { onComplete: () => void }) => {
+export const LevelTwoExtension = ({ onComplete }: { onComplete: (story: string) => void }) => {
   const [input, setInput] = useState("");
   const [story, setStory] = useState("");
   const [loading, setLoading] = useState(false);
@@ -222,7 +222,7 @@ export const LevelTwoExtension = ({ onComplete }: { onComplete: () => void }) =>
              {iteration === 1 ? "AI가 작성한 미래가 마음에 드시나요? 피드백을 통해 내용을 더 풍성하게 만들어보세요!" : "멋진 협업입니다! AI 파트너와 함께 상상하면 꿈이 더 구체적으로 변합니다."}
            </p>
            {iteration >= 2 && (
-             <Button onClick={onComplete} variant="success">다음 단계: 팩트 체크 &rarr;</Button>
+             <Button onClick={() => onComplete(story)} variant="success">다음 단계: 팩트 체크 &rarr;</Button>
            )}
          </div>
       )}
@@ -251,7 +251,7 @@ export const LevelThreeCritical = ({ onComplete }: { onComplete: () => void }) =
     setScenario(null);
     setResult(null);
     const fact = await generateTrickyFact(topicId);
-    setScenario(fact);
+    setScenario({ ...fact, topic: topicId });
     setLoading(false);
   };
 

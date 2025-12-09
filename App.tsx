@@ -48,7 +48,7 @@ const IntroScreen = ({ onStart }: { onStart: (profile: UserProfile) => void }) =
         <div className="space-y-3 mb-6">
            <input
             type="text"
-            placeholder="학교 이름 (예: 서울중학교)"
+            placeholder="학교 이름 (예: 부산중학교)"
             value={profile.school}
             onChange={(e) => setProfile({...profile, school: e.target.value})}
             className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-center text-white focus:ring-2 focus:ring-purple-500 outline-none"
@@ -82,7 +82,7 @@ const IntroScreen = ({ onStart }: { onStart: (profile: UserProfile) => void }) =
 };
 
 // --- Survey Screen ---
-const SurveyScreen = ({ profile, onComplete }: { profile: UserProfile, onComplete: () => void }) => {
+const SurveyScreen = ({ profile, diary, onComplete }: { profile: UserProfile, diary: string, onComplete: () => void }) => {
   const [q1, setQ1] = useState<number>(0);
   const [q2, setQ2] = useState<number>(0);
   const [q3, setQ3] = useState<string>('');
@@ -103,6 +103,7 @@ const SurveyScreen = ({ profile, onComplete }: { profile: UserProfile, onComplet
       satisfaction: q1,
       helpfulness: q2,
       opinion: q3,
+      diary: diary, // Include the diary text
       timestamp: new Date().toISOString()
     };
 
@@ -327,6 +328,7 @@ const CertificateScreen = ({ profile, onRestart }: { profile: UserProfile, onRes
 export default function App() {
   const [stage, setStage] = useState<GameStage>(GameStage.INTRO);
   const [userProfile, setUserProfile] = useState<UserProfile>({ name: '', school: '', grade: '' });
+  const [userDiary, setUserDiary] = useState<string>('');
 
   const handleStart = (profile: UserProfile) => {
     setUserProfile(profile);
@@ -346,7 +348,7 @@ export default function App() {
       case GameStage.LEVEL_2_EXTENSION:
         return (
           <div className="min-h-screen p-6 pt-12 flex flex-col items-center">
-            <LevelTwoExtension onComplete={() => setStage(GameStage.LEVEL_3_CRITICAL)} />
+            <LevelTwoExtension onComplete={(story) => { setUserDiary(story); setStage(GameStage.LEVEL_3_CRITICAL); }} />
           </div>
         );
       case GameStage.LEVEL_3_CRITICAL:
@@ -357,7 +359,7 @@ export default function App() {
         );
       case GameStage.SURVEY:
         return (
-           <SurveyScreen profile={userProfile} onComplete={() => setStage(GameStage.CERTIFICATE)} />
+           <SurveyScreen profile={userProfile} diary={userDiary} onComplete={() => setStage(GameStage.CERTIFICATE)} />
         );
       case GameStage.CERTIFICATE:
         return <CertificateScreen profile={userProfile} onRestart={() => setStage(GameStage.INTRO)} />;
