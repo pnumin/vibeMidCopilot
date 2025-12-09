@@ -4,13 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Co-Pilot Academy</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ['Orbitron', 'sans-serif'],
+              sans: ['Noto Sans KR', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+    <script>
+      // Initialize theme based on localStorage or system preference
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <style>
       body {
         font-family: 'Noto Sans KR', sans-serif;
-        background-color: #0f172a;
-        color: #e2e8f0;
       }
       .font-display {
         font-family: 'Orbitron', sans-serif;
@@ -38,7 +57,7 @@
 }
 </script>
 </head>
-  <body>
+  <body class="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-[#e2e8f0] transition-colors duration-300">
     <div id="root"></div>
   </body>
 </html>

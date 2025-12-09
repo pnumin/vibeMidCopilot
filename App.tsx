@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameStage, UserProfile } from './types';
 import { LevelOnePrompt, LevelTwoExtension, LevelThreeCritical } from './components/Levels';
 import html2canvas from 'html2canvas';
@@ -10,10 +10,10 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyuQxkgeKj8eB
 
 // --- Background Component ---
 const Background = () => (
-  <div className="fixed inset-0 -z-10 bg-[#0f172a] overflow-hidden">
-    <div className="absolute w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-3xl -top-20 -left-20 animate-float" />
-    <div className="absolute w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-3xl bottom-0 right-0 animate-float" style={{ animationDelay: '2s' }} />
-    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+  <div className="fixed inset-0 -z-10 overflow-hidden bg-slate-50 dark:bg-[#0f172a] transition-colors duration-300">
+    <div className="absolute w-[500px] h-[500px] bg-purple-300/30 dark:bg-purple-600/20 rounded-full blur-3xl -top-20 -left-20 animate-float" />
+    <div className="absolute w-[400px] h-[400px] bg-blue-300/30 dark:bg-blue-600/20 rounded-full blur-3xl bottom-0 right-0 animate-float" style={{ animationDelay: '2s' }} />
+    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 dark:opacity-20"></div>
   </div>
 );
 
@@ -30,19 +30,19 @@ const IntroScreen = ({ onStart }: { onStart: (profile: UserProfile) => void }) =
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center space-y-8 animate-fadeIn">
       <div className="space-y-4">
-        <h1 className="text-5xl md:text-7xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 pb-2">
+        <h1 className="text-5xl md:text-7xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 pb-2">
           AI Co-Pilot Academy
         </h1>
-        <p className="text-xl md:text-2xl text-slate-300">
+        <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300">
           AI와 함께 떠나는 나의 꿈 찾기 여행
         </p>
       </div>
 
-      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-600 p-8 rounded-2xl max-w-md w-full shadow-2xl">
-        <p className="mb-6 text-slate-300 leading-relaxed">
+      <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-600 p-8 rounded-2xl max-w-md w-full shadow-2xl transition-colors duration-300">
+        <p className="mb-6 text-slate-700 dark:text-slate-300 leading-relaxed">
           환영합니다, 생도님!<br/>
           미래 시대의 리더가 되기 위한<br/>
-          <span className="text-yellow-400 font-bold">3가지 핵심 미션</span>을 수행할 준비가 되셨나요?
+          <span className="text-amber-600 dark:text-yellow-400 font-bold">3가지 핵심 미션</span>을 수행할 준비가 되셨나요?
         </p>
         
         <div className="space-y-3 mb-6">
@@ -51,21 +51,21 @@ const IntroScreen = ({ onStart }: { onStart: (profile: UserProfile) => void }) =
             placeholder="학교 이름 (예: 부산중학교)"
             value={profile.school}
             onChange={(e) => setProfile({...profile, school: e.target.value})}
-            className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-center text-white focus:ring-2 focus:ring-purple-500 outline-none"
+            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg p-3 text-center text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none transition-colors"
           />
           <input
             type="text"
             placeholder="학년 반 (예: 1학년 3반)"
             value={profile.grade}
             onChange={(e) => setProfile({...profile, grade: e.target.value})}
-            className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-center text-white focus:ring-2 focus:ring-purple-500 outline-none"
+            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg p-3 text-center text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none transition-colors"
           />
           <input
             type="text"
             placeholder="이름 (예: 홍길동)"
             value={profile.name}
             onChange={(e) => setProfile({...profile, name: e.target.value})}
-            className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-center text-white focus:ring-2 focus:ring-purple-500 outline-none"
+            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg p-3 text-center text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none transition-colors"
           />
         </div>
 
@@ -134,7 +134,7 @@ const SurveyScreen = ({ profile, diary, onComplete }: { profile: UserProfile, di
 
   const StarRating = ({ value, onChange, label }: { value: number, onChange: (v: number) => void, label: string }) => (
     <div className="mb-6">
-      <label className="block text-lg font-bold text-slate-200 mb-2">{label}</label>
+      <label className="block text-lg font-bold text-slate-800 dark:text-slate-200 mb-2">{label}</label>
       <div className="flex gap-2 justify-center">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -146,7 +146,7 @@ const SurveyScreen = ({ profile, diary, onComplete }: { profile: UserProfile, di
           </button>
         ))}
       </div>
-      <div className="flex justify-between text-xs text-slate-400 mt-1 px-2">
+      <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1 px-2">
         <span>별로예요</span>
         <span>최고예요</span>
       </div>
@@ -155,10 +155,10 @@ const SurveyScreen = ({ profile, diary, onComplete }: { profile: UserProfile, di
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 animate-fadeIn max-w-2xl mx-auto w-full">
-      <div className="bg-slate-800/80 backdrop-blur-md border border-slate-600 rounded-2xl p-8 shadow-2xl w-full">
+      <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-600 rounded-2xl p-8 shadow-2xl w-full transition-colors duration-300">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-display text-yellow-400 mb-2">잠깐! 마지막 미션 📝</h2>
-          <p className="text-slate-300">수료증 발급 전에 오늘의 경험을 들려주세요.</p>
+          <h2 className="text-3xl font-display text-amber-500 dark:text-yellow-400 mb-2">잠깐! 마지막 미션 📝</h2>
+          <p className="text-slate-600 dark:text-slate-300">수료증 발급 전에 오늘의 경험을 들려주세요.</p>
         </div>
 
         <StarRating 
@@ -174,12 +174,12 @@ const SurveyScreen = ({ profile, diary, onComplete }: { profile: UserProfile, di
         />
 
         <div className="mb-8">
-          <label className="block text-lg font-bold text-slate-200 mb-2">3. 가장 기억에 남는 점이나 아쉬운 점을 적어주세요.</label>
+          <label className="block text-lg font-bold text-slate-800 dark:text-slate-200 mb-2">3. 가장 기억에 남는 점이나 아쉬운 점을 적어주세요.</label>
           <textarea
             value={q3}
             onChange={(e) => setQ3(e.target.value)}
             placeholder="자유롭게 작성해주세요..."
-            className="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none h-32"
+            className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded-xl p-4 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none h-32 transition-colors"
           />
         </div>
 
@@ -315,7 +315,7 @@ const CertificateScreen = ({ profile, onRestart }: { profile: UserProfile, onRes
 
         <button
           onClick={onRestart}
-          className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-full transition-colors border border-slate-500"
+          className="flex-1 bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-white font-bold py-3 px-8 rounded-full transition-colors border border-slate-300 dark:border-slate-500 shadow-sm"
         >
           처음으로 돌아가기
         </button>
@@ -329,6 +329,26 @@ export default function App() {
   const [stage, setStage] = useState<GameStage>(GameStage.INTRO);
   const [userProfile, setUserProfile] = useState<UserProfile>({ name: '', school: '', grade: '' });
   const [userDiary, setUserDiary] = useState<string>('');
+  
+  // Theme state initialized from DOM (which was set by the script in index.html)
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (typeof document !== 'undefined') {
+      return document.documentElement.classList.contains('dark');
+    }
+    return true;
+  });
+
+  const toggleTheme = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    if (newMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.theme = 'light';
+    }
+  };
 
   const handleStart = (profile: UserProfile) => {
     setUserProfile(profile);
@@ -371,9 +391,18 @@ export default function App() {
   return (
     <>
       <Background />
+      {/* Theme Toggle Button */}
+      <button 
+        onClick={toggleTheme}
+        className="fixed top-4 right-4 z-50 p-3 rounded-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-600 shadow-lg backdrop-blur-sm transition-all hover:scale-110 active:scale-95"
+        aria-label="Toggle Theme"
+      >
+        {isDarkMode ? '☀️' : '🌙'}
+      </button>
+
       {/* Progress Bar (Visible only during levels) */}
       {stage !== GameStage.INTRO && stage !== GameStage.CERTIFICATE && stage !== GameStage.SURVEY && (
-        <div className="fixed top-0 left-0 w-full h-2 bg-slate-800 z-50">
+        <div className="fixed top-0 left-0 w-full h-2 bg-slate-200 dark:bg-slate-800 z-50">
           <div 
             className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
             style={{ 
