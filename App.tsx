@@ -4,6 +4,10 @@ import { LevelOnePrompt, LevelTwoExtension, LevelThreeCritical } from './compone
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
+// Placeholder for the Google Apps Script Web App URL
+// Users must deploy a Google Apps Script attached to their sheet to handle the POST request.
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyuQxkgeKj8eB1sPDlYlb4q_9uUV73ZO7rw7CGb1xXDadja9gS0XV382pU-wYeUhDoE/exec'; 
+
 // --- Background Component ---
 const Background = () => (
   <div className="fixed inset-0 -z-10 bg-[#0f172a] overflow-hidden">
@@ -71,6 +75,119 @@ const IntroScreen = ({ onStart }: { onStart: (profile: UserProfile) => void }) =
           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 rounded-xl text-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/30"
         >
           미션 시작하기 🚀
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// --- Survey Screen ---
+const SurveyScreen = ({ profile, onComplete }: { profile: UserProfile, onComplete: () => void }) => {
+  const [q1, setQ1] = useState<number>(0);
+  const [q2, setQ2] = useState<number>(0);
+  const [q3, setQ3] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    
+    // Prepare data
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
+    const surveyData = {
+      date: dateStr,
+      school: profile.school,
+      grade: profile.grade,
+      name: profile.name,
+      satisfaction: q1,
+      helpfulness: q2,
+      opinion: q3,
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      // Note: This requires a Google Apps Script deployed as a Web App to handle the POST request
+      // and write to the specific sheet based on 'dateStr'.
+      // Using 'no-cors' mode allows sending data to Google Forms/Scripts without reading the response.
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(surveyData),
+      });
+      
+      // Simulate network delay if script is instant or fails silently (common in no-cors)
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+    } catch (error) {
+      console.error("Survey submission failed", error);
+      // Proceed anyway so user isn't stuck
+    }
+
+    setIsSubmitting(false);
+    onComplete();
+  };
+
+  const StarRating = ({ value, onChange, label }: { value: number, onChange: (v: number) => void, label: string }) => (
+    <div className="mb-6">
+      <label className="block text-lg font-bold text-slate-200 mb-2">{label}</label>
+      <div className="flex gap-2 justify-center">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            onClick={() => onChange(star)}
+            className={`text-3xl transition-transform hover:scale-110 ${star <= value ? 'grayscale-0' : 'grayscale opacity-30'}`}
+          >
+            ⭐
+          </button>
+        ))}
+      </div>
+      <div className="flex justify-between text-xs text-slate-400 mt-1 px-2">
+        <span>별로예요</span>
+        <span>최고예요</span>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-6 animate-fadeIn max-w-2xl mx-auto w-full">
+      <div className="bg-slate-800/80 backdrop-blur-md border border-slate-600 rounded-2xl p-8 shadow-2xl w-full">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-display text-yellow-400 mb-2">잠깐! 마지막 미션 📝</h2>
+          <p className="text-slate-300">수료증 발급 전에 오늘의 경험을 들려주세요.</p>
+        </div>
+
+        <StarRating 
+          label="1. 오늘 AI 수업은 재미있었나요?" 
+          value={q1} 
+          onChange={setQ1} 
+        />
+
+        <StarRating 
+          label="2. AI가 나의 진로 탐색에 도움이 되었나요?" 
+          value={q2} 
+          onChange={setQ2} 
+        />
+
+        <div className="mb-8">
+          <label className="block text-lg font-bold text-slate-200 mb-2">3. 가장 기억에 남는 점이나 아쉬운 점을 적어주세요.</label>
+          <textarea
+            value={q3}
+            onChange={(e) => setQ3(e.target.value)}
+            placeholder="자유롭게 작성해주세요..."
+            className="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none h-32"
+          />
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          disabled={!q1 || !q2 || isSubmitting}
+          className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500 text-white font-bold py-4 rounded-xl text-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+        >
+          {isSubmitting ? "저장 중..." : "제출하고 수료증 받기 🏆"}
         </button>
       </div>
     </div>
@@ -235,8 +352,12 @@ export default function App() {
       case GameStage.LEVEL_3_CRITICAL:
         return (
           <div className="min-h-screen p-6 pt-12 flex flex-col items-center">
-            <LevelThreeCritical onComplete={() => setStage(GameStage.CERTIFICATE)} />
+            <LevelThreeCritical onComplete={() => setStage(GameStage.SURVEY)} />
           </div>
+        );
+      case GameStage.SURVEY:
+        return (
+           <SurveyScreen profile={userProfile} onComplete={() => setStage(GameStage.CERTIFICATE)} />
         );
       case GameStage.CERTIFICATE:
         return <CertificateScreen profile={userProfile} onRestart={() => setStage(GameStage.INTRO)} />;
@@ -249,7 +370,7 @@ export default function App() {
     <>
       <Background />
       {/* Progress Bar (Visible only during levels) */}
-      {stage !== GameStage.INTRO && stage !== GameStage.CERTIFICATE && (
+      {stage !== GameStage.INTRO && stage !== GameStage.CERTIFICATE && stage !== GameStage.SURVEY && (
         <div className="fixed top-0 left-0 w-full h-2 bg-slate-800 z-50">
           <div 
             className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
